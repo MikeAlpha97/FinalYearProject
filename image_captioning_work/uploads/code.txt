@@ -1,0 +1,233 @@
+============ Algorithm For Start Without Navigation Mode ==========
+
+Start;
+Declare seg;
+Declare camera;
+Declare display;
+Declare sign;
+Declare lane;
+Declare distancs;
+Declare voice;
+Declare accidentDetector;
+Declare setting;
+Declare detectedObjects;
+
+setting = Setting();
+accidentDetector = AccidentDetector();
+voice = VoiceCommands();
+display = DistanceCalculator();
+lane = LaneDetector();
+sign = SignClassifyer();
+display = OverlayDisplay();
+Camera = MainCameraController()
+seg = Segmentor()
+
+camera.openCamera();
+
+isSegmenting =  False;
+isDetectingLane  = True;
+
+Start Thread
+    cameraPreview()
+End Thread
+
+accidentDetector.connectToOBD()
+Start Thread
+    WHILE True
+        IF setting.isVoiceCommandsAllowed();
+            command = voice.listen();
+            IF command is not empty and voice.isValidCommand()
+                voice.preformAction(command)
+            END IF
+        END IF
+        ELSE
+            BREAK LOOP;
+        END ELSE
+    END WHILE
+End Thread
+
+Start Thread
+    WHILE True
+        IF setting.isAccidentDetectorAllowed()
+            IF accidentDetector.isAirBagTriggred();
+                IF not accidentDetector.abort()
+                    accidentDetector.run();
+                END IF
+            END IF
+            ELSE
+                BREAK LOOP;
+            END ELSE
+        END IF
+    END WHILE
+END Thread
+
+FOR frame in captureFrame()
+    IF  not isSegmenting 
+
+        Start Thread
+            isSegmenting = True;
+            detectedObjects = seg.segment(frame);
+            IF setting.isObjectDetectionAllowed();
+                display.drawObjects(detectedObjects,frame);
+            END IF
+
+            IF not detectedObjects.size() == 0 and setting.isDistanceCalulatorAllowed()    
+                Start Thread
+                    FOR object in detectedObjects
+                        distancs.setLocation(object.getLocation())
+                        distancs.calculateDistance(object.getLable(),frame);
+                        display.drawDistance();
+                        IF distancs.isBelowCriticaleDistance() and not setting.isMuteWarningAllowed()
+                            display.drawWaring();
+                            voice.displayWaring();
+                        END IF 
+                    END FOR 
+                End Thread
+            END IF
+
+            IF setting.isSignRecognizerAllowed()
+                sign.setFrame(frame);
+                sign.setObjects(detectedObjects);
+                recoganizedSign = sign.recognize();
+                diplay.drawSign(recoganizedSign,frame);
+            END IF
+
+            isSegmenting = False;
+ 	  	End Thread
+    END IF
+    
+    IF not isDetectingLane and setting.isLaneGuideAllowed()
+        Start Thread
+            isDetectingLane = True;
+            lane.setImagData(frame);
+            points = lane.getLinesPoints();
+            display.drawLane(points,frame);
+            isDetectingLane = False;
+ 		End Thread
+    End IF
+End FOR
+
+
+
+
+================= Algorithm For Start With Navigation Mode ============
+
+Start;
+Declare seg;
+Declare camera;
+Declare display;
+Declare sign;
+Declare lane;
+Declare distancs;
+Declare voice;
+Declare accidentDetector;
+Declare setting;
+Declare detectedObjects;
+Declare route;
+
+route = Route();
+setting = Setting();
+accidentDetector = AccidentDetector();
+voice = VoiceCommands();
+display = DistanceCalculator();
+lane = LaneDetector();
+sign = SignClassifyer();
+display = OverlayDisplay();
+Camera = MainCameraController()
+seg = Segmentor()
+
+camera.openCamera();
+
+isSegmenting =  False;
+isDetectingLane  = True;
+
+polylines = calculateRoutes() // this function sets the route
+
+Start Thread
+    cameraPreview()
+End Thread
+
+accidentDetector.connectToOBD()
+Start Thread
+    WHILE True
+        IF setting.isVoiceCommandsAllowed();
+            command = voice.listen();
+            IF command is not empty and voice.isValidCommand()
+                voice.preformAction(command)
+            END IF
+        END IF
+        ELSE
+            BREAK LOOP;
+        END ELSE
+    END WHILE
+End Thread
+
+Start Thread
+    WHILE True
+        IF setting.isAccidentDetectorAllowed()
+            IF accidentDetector.isAirBagTriggred();
+                IF not accidentDetector.abort()
+                    accidentDetector.run();
+                END IF
+            END IF
+            ELSE
+                BREAK LOOP;
+            END ELSE
+        END IF
+    END WHILE
+END Thread
+
+FOR frame in captureFrame()
+    
+    Start Thread
+        route.getCurrentLocatin();
+        route.findNextStep();
+        locationOfArrow = route.calculateArrow();
+        display.drawArrow(frame,locationOfArrow);
+    END Thread
+        
+    
+    IF  not isSegmenting 
+        
+        Start Thread
+            isSegmenting = True;
+            detectedObjects = seg.segment(frame);
+            IF setting.isObjectDetectionAllowed();
+                display.drawObjects(detectedObjects,frame);
+            END IF
+
+            IF not detectedObjects.size() == 0 and setting.isDistanceCalulatorAllowed()    
+                Start Thread
+                    FOR object in detectedObjects
+                        distancs.setLocation(object.getLocation())
+                        distancs.calculateDistance(object.getLable(),frame);
+                        display.drawDistance();
+                        IF distancs.isBelowCriticaleDistance() and not setting.isMuteWarningAllowed()
+                            display.drawWaring();
+                            voice.displayWaring();
+                        END IF 
+                    END FOR 
+                End Thread
+            END IF
+
+            IF setting.isSignRecognizerAllowed()
+                sign.setFrame(frame);
+                sign.setObjects(detectedObjects);
+                recoganizedSign = sign.recognize();
+                diplay.drawSign(recoganizedSign,frame);
+            END IF
+
+            isSegmenting = False;
+ 	  	End Thread
+    END IF
+    
+    IF not isDetectingLane and setting.isLaneGuideAllowed()
+        Start Thread
+            isDetectingLane = True;
+            lane.setImagData(frame);
+            points = lane.getLinesPoints();
+            display.drawLane(points,frame);
+            isDetectingLane = False;
+ 		End Thread
+    End IF
+End FOR

@@ -1,0 +1,4 @@
+53.627 person
+77.75 car
+99.719 aeroplane
+99.774 person

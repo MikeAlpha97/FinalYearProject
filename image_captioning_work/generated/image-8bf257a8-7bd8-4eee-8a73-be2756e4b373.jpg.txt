@@ -1,0 +1,5 @@
+63.32 book
+66.151 book
+70.057 book
+80.445 book
+83.423 laptop

@@ -1,0 +1,4 @@
+73.811 diningtable
+93.249 cell-phone
+99.472 laptop
+99.965 mouse

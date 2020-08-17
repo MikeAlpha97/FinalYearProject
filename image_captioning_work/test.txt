@@ -1,0 +1,1 @@
+<start> a dog is sitting on a couch with a remote . <end>

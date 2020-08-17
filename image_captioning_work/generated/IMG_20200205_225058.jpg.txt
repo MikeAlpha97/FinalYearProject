@@ -1,0 +1,3 @@
+86.502 bed
+93.993 cell-phone
+99.27 laptop

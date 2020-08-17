@@ -1,0 +1,13 @@
+55.48 truck
+56.809 truck
+60.339 truck
+64.862 truck
+64.937 car
+66.239 car
+72.62 aeroplane
+76.693 aeroplane
+81.024 aeroplane
+81.715 person
+81.936 aeroplane
+84.688 truck
+93.767 aeroplane

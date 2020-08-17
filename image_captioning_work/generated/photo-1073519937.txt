@@ -1,0 +1,7 @@
+63.936 motorbike
+94.227 person
+96.993 motorbike
+98.601 person
+99.257 person
+99.379 person
+99.864 person

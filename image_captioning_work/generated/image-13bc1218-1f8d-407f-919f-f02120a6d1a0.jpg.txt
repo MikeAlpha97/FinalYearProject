@@ -1,0 +1,9 @@
+54.12 book
+57.745 book
+57.902 book
+64.212 book
+65.722 book
+68.294 book
+70.419 book
+93.977 laptop
+95.303 bed
